@@ -1,0 +1,27 @@
+[project]
+name = "english-to-hausa"
+version = "0.1.0"
+description = "FastAPI English to Hausa translation and synthesis pipeline"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "sqlalchemy>=2.0.0",
+    "psycopg2-binary>=2.9.0",
+    "python-multipart>=0.0.9",
+    "torch>=2.2.0",
+    "transformers>=4.38.0",
+    "yt-dlp>=2024.3.10",
+    "scipy>=1.12.0",
+    "soundfile>=0.12.1",
+    "cloudinary>=1.39.0",
+    "alembic>=1.18.4",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.3.0",
+]
