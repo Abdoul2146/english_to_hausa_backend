@@ -32,7 +32,7 @@ async def run_tts_pipeline(job_id: str, text: str, speed: float, db_session: Ses
         crud_job.update_job_status(db_session, job_id, "processing", "saving", 80.0, "Uploading/saving synthesized audio...")
         media_url = upload_to_cloudinary_if_enabled(output_wav)
         if not media_url:
-            media_url = f"/api/tts/{job_id}/download"
+            media_url = f"{settings.BASE_URL}/api/tts/{job_id}/download"
             
         crud_job.complete_job(
             db_session,

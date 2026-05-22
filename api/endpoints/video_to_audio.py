@@ -41,7 +41,7 @@ async def run_video_to_audio_pipeline(job_id: str, url: str, max_duration: int, 
         crud_job.update_job_status(db_session, job_id, "processing", "saving", 90.0, "Uploading/saving final audio file...")
         media_url = upload_to_cloudinary_if_enabled(audio_path)
         if not media_url:
-            media_url = f"/api/video-to-audio/{job_id}/download"
+            media_url = f"{settings.BASE_URL}/api/video-to-audio/{job_id}/download"
             
         crud_job.complete_job(
             db_session, 
@@ -63,7 +63,7 @@ async def run_file_to_audio_pipeline(job_id: str, temp_video_path: Path, db_sess
         crud_job.update_job_status(db_session, job_id, "processing", "saving", 80.0, "Uploading/saving final audio file...")
         media_url = upload_to_cloudinary_if_enabled(audio_path)
         if not media_url:
-            media_url = f"/api/video-to-audio/{job_id}/download"
+            media_url = f"{settings.BASE_URL}/api/video-to-audio/{job_id}/download"
             
         # Clean up intermediate uploaded video file
         if temp_video_path.exists():

@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     CLOUDINARY_API_KEY: Optional[str] = None
     CLOUDINARY_API_SECRET: Optional[str] = None
 
+    # Base URL for constructing absolute download URLs
+    BASE_URL: str = "http://localhost:8000"
+
     # Paths
     STORAGE_DIR: str = "C:\\Backend\\english_to_hausa\\downloads"
     MODEL_CACHE_DIR: str = "C:\\Backend\\english_to_hausa\\models_cache"
