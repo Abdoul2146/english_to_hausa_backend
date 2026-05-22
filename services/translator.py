@@ -1,19 +1,17 @@
 from services.model_loader import ModelLoader
 
 def translate_text(text: str, source_lang: str = "eng_Latn", target_lang: str = "hau_Latn") -> str:
-    translator = ModelLoader.get_translator()
-    
-    # Run distilled translation pipeline
-    result = translator(
-        text,
-        src_lang=source_lang,
-        tgt_lang=target_lang,
+    resources = ModelLoader.get_translator()
+    model = resources["model"]
+    tokenizer = resources["tokenizer"]
+
+    inputs = tokenizer(text, return_tensors="pt").to(model.device)
+    translated_tokens = model.generate(
+        **inputs,
+        forced_bos_token_id=tokenizer.convert_tokens_to_ids(target_lang),
         max_length=256
     )
-    
-    if isinstance(result, list) and len(result) > 0:
-        return result[0].get("translation_text", "").strip()
-    return ""
+    return tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
 
 def translate_segments(segments: list, source_lang: str = "eng_Latn", target_lang: str = "hau_Latn") -> list:
     translated_segments = []
