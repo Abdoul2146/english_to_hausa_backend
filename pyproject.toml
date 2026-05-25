@@ -19,6 +19,7 @@ dependencies = [
     "soundfile>=0.12.1",
     "cloudinary>=1.39.0",
     "alembic>=1.18.4",
+    "gtts>=2.5.4",
 ]
 
 [dependency-groups]

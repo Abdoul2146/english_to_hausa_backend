@@ -1,6 +1,6 @@
 import os
 import torch
-from transformers import pipeline, VitsModel, VitsTokenizer, AutoModelForSeq2SeqLM, AutoTokenizer
+from transformers import pipeline, AutoModelForSeq2SeqLM, AutoTokenizer
 from models.config import settings
 
 class ModelLoader:
@@ -30,17 +30,6 @@ class ModelLoader:
                 "tokenizer": AutoTokenizer.from_pretrained("facebook/nllb-200-distilled-600M")
             }
         return cls._cache["translator"]
-
-    @classmethod
-    def get_tts(cls):
-        if "tts" not in cls._cache:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-            os.environ["HF_HOME"] = settings.MODEL_CACHE_DIR
-            cls._cache["tts"] = {
-                "model": VitsModel.from_pretrained("facebook/mms-tts-hau").to(device),
-                "tokenizer": VitsTokenizer.from_pretrained("facebook/mms-tts-hau")
-            }
-        return cls._cache["tts"]
 
     @classmethod
     def unload_all(cls):

@@ -26,7 +26,7 @@ def upload_to_cloudinary_if_enabled(local_path: Path) -> str:
 
 async def run_tts_pipeline(job_id: str, text: str, speed: float, db_session: Session):
     try:
-        crud_job.update_job_status(db_session, job_id, "processing", "synthesizing", 40.0, "Synthesizing Hausa text-to-speech with MMS...")
+        crud_job.update_job_status(db_session, job_id, "processing", "synthesizing", 40.0, "Synthesizing speech with Google TTS...")
         output_wav = generate_tts_wav(job_id, text, speed)
         
         crud_job.update_job_status(db_session, job_id, "processing", "saving", 80.0, "Uploading/saving synthesized audio...")
