@@ -1,7 +1,10 @@
 import httpx
 import time
+import socket
 from pathlib import Path
 from models.config import settings
+
+socket.getaddrinfo = lambda h, p, f=0, t=0, pr=0, fl=0: socket.getaddrinfo(h, p, socket.AF_INET, t, pr, fl)
 
 HF_WHISPER_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
 MAX_RETRIES = 3

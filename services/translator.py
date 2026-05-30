@@ -1,6 +1,9 @@
 import httpx
 import time
+import socket
 from models.config import settings
+
+socket.getaddrinfo = lambda h, p, f=0, t=0, pr=0, fl=0: socket.getaddrinfo(h, p, socket.AF_INET, t, pr, fl)
 
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
