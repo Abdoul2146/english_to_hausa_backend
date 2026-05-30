@@ -13,16 +13,21 @@ def transcribe_audio(audio_path: Path) -> dict:
     headers = {"Authorization": f"Bearer {settings.HF_TOKEN}"}
 
     for attempt in range(MAX_RETRIES):
-        with httpx.Client(timeout=120.0) as client:
-            response = client.post(HF_WHISPER_URL, headers=headers, data=audio_bytes)
+        try:
+            with httpx.Client(timeout=120.0) as client:
+                response = client.post(HF_WHISPER_URL, headers=headers, data=audio_bytes)
 
-        if response.status_code == 503:
-            time.sleep(5)
-            continue
+            if response.status_code == 503:
+                time.sleep(5)
+                continue
 
-        response.raise_for_status()
-        result = response.json()
-        break
+            response.raise_for_status()
+            result = response.json()
+            break
+        except (httpx.ConnectError, httpx.RemoteProtocolError):
+            if attempt == MAX_RETRIES - 1:
+                raise
+            time.sleep(2 ** attempt)
 
     full_text = result.get("text", "").strip()
 

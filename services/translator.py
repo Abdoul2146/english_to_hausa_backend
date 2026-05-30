@@ -1,4 +1,5 @@
 import httpx
+import time
 from models.config import settings
 
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
@@ -22,11 +23,18 @@ def translate_text(text: str, source_lang: str = "en", target_lang: str = "ha") 
         }
     }
 
-    with httpx.Client(timeout=60.0) as client:
-        url = f"{GEMINI_URL}?key={settings.GEMINI_API_KEY}"
-        response = client.post(url, json=payload)
-        response.raise_for_status()
-        result = response.json()
+    for attempt in range(3):
+        try:
+            with httpx.Client(timeout=60.0) as client:
+                url = f"{GEMINI_URL}?key={settings.GEMINI_API_KEY}"
+                response = client.post(url, json=payload)
+            response.raise_for_status()
+            result = response.json()
+            break
+        except (httpx.ConnectError, httpx.RemoteProtocolError):
+            if attempt == 2:
+                raise
+            time.sleep(2 ** attempt)
 
     return result["candidates"][0]["content"]["parts"][0]["text"].strip()
 
