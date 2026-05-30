@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     CLOUDINARY_API_KEY: Optional[str] = None
     CLOUDINARY_API_SECRET: Optional[str] = None
 
+    # API Keys for hosted inference (free tiers)
+    HF_TOKEN: str = ""
+    GEMINI_API_KEY: str = ""
+
     # Base URL for constructing absolute download URLs
     BASE_URL: str = "http://localhost:8000"
 

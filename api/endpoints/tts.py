@@ -6,14 +6,20 @@ from schema.api_schemas import TTSRequest, JobAcceptedResponse
 from schema.job_schemas import JobResponse
 import crud.job as crud_job
 from services.tts_generator import generate_tts_wav
-import cloudinary
-import cloudinary.uploader
+try:
+    import cloudinary
+    import cloudinary.uploader
+    _cloudinary_available = True
+except ImportError:
+    _cloudinary_available = False
 from models.config import settings
 from pathlib import Path
 
 router = APIRouter(prefix="/tts", tags=["Stage 3: Text to Speech"])
 
 def upload_to_cloudinary_if_enabled(local_path: Path) -> str:
+    if not _cloudinary_available:
+        return ""
     if settings.CLOUDINARY_CLOUD_NAME and settings.CLOUDINARY_API_KEY and settings.CLOUDINARY_API_SECRET:
         cloudinary.config(
             cloud_name=settings.CLOUDINARY_CLOUD_NAME,

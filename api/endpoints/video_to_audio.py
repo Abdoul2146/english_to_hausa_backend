@@ -8,8 +8,12 @@ import crud.job as crud_job
 from services.downloader import download_video
 from services.audio_extractor import extract_audio_wav
 from services.file_manager import get_job_file_path
-import cloudinary
-import cloudinary.uploader
+try:
+    import cloudinary
+    import cloudinary.uploader
+    _cloudinary_available = True
+except ImportError:
+    _cloudinary_available = False
 from models.config import settings
 from pathlib import Path
 import shutil
@@ -17,6 +21,8 @@ import shutil
 router = APIRouter(prefix="/video-to-audio", tags=["Stage 1: Video to Audio"])
 
 def upload_to_cloudinary_if_enabled(local_path: Path) -> str:
+    if not _cloudinary_available:
+        return ""
     if settings.CLOUDINARY_CLOUD_NAME and settings.CLOUDINARY_API_KEY and settings.CLOUDINARY_API_SECRET:
         cloudinary.config(
             cloud_name=settings.CLOUDINARY_CLOUD_NAME,

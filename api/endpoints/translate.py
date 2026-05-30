@@ -59,7 +59,7 @@ async def run_translate_pipeline(
     db_session: Session
 ):
     try:
-        crud_job.update_job_status(db_session, job_id, "processing", "nllb_inference", 50.0, "Running NLLB translation...")
+        crud_job.update_job_status(db_session, job_id, "processing", "gemini_translation", 50.0, "Running Gemini translation...")
         
         if segments:
             # Segment-by-segment translation preserving timestamps
@@ -74,7 +74,7 @@ async def run_translate_pipeline(
                     "segments": translated_segments,
                     "metadata": {
                         "word_count_hausa": len(hausa_text.split()),
-                        "model": "facebook/nllb-200-distilled-600M"
+                        "model": "google/gemini-2.5-flash"
                     }
                 }
             )
@@ -90,7 +90,7 @@ async def run_translate_pipeline(
                     "segments": [{"start": 0.0, "end": 0.0, "text": hausa_text}],
                     "metadata": {
                         "word_count_hausa": len(hausa_text.split()),
-                        "model": "facebook/nllb-200-distilled-600M"
+                        "model": "google/gemini-2.5-flash"
                     }
                 }
             )

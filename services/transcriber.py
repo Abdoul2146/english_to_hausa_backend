@@ -1,41 +1,33 @@
+import httpx
+import time
 from pathlib import Path
-from services.model_loader import ModelLoader
+from models.config import settings
+
+HF_WHISPER_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
+MAX_RETRIES = 3
 
 def transcribe_audio(audio_path: Path) -> dict:
-    whisper_pipeline = ModelLoader.get_whisper()
-    
-    # Run Whisper pipeline with standard configs
-    result = whisper_pipeline(
-        str(audio_path),
-        chunk_length_s=30,
-        batch_size=16,
-        return_timestamps=True
-    )
-    
-    segments = []
-    # Structure segments with timestamps cleanly
-    chunks = result.get("chunks", [])
-    if chunks:
-        for chunk in chunks:
-            timestamp = chunk.get("timestamp", (0.0, 0.0))
-            # Handle possible null timestamps
-            start = timestamp[0] if timestamp[0] is not None else 0.0
-            end = timestamp[1] if timestamp[1] is not None else 0.0
-            segments.append({
-                "start": start,
-                "end": end,
-                "text": chunk.get("text", "").strip()
-            })
-    else:
-        # Fallback if chunks are missing
-        segments.append({
-            "start": 0.0,
-            "end": 0.0,
-            "text": result.get("text", "").strip()
-        })
-        
+    with open(audio_path, "rb") as f:
+        audio_bytes = f.read()
+
+    headers = {"Authorization": f"Bearer {settings.HF_TOKEN}"}
+
+    for attempt in range(MAX_RETRIES):
+        with httpx.Client(timeout=120.0) as client:
+            response = client.post(HF_WHISPER_URL, headers=headers, data=audio_bytes)
+
+        if response.status_code == 503:
+            time.sleep(5)
+            continue
+
+        response.raise_for_status()
+        result = response.json()
+        break
+
+    full_text = result.get("text", "").strip()
+
     return {
-        "segments": segments,
-        "full_text": result.get("text", "").strip(),
+        "segments": [{"start": 0.0, "end": 0.0, "text": full_text}],
+        "full_text": full_text,
         "language": "en"
     }
