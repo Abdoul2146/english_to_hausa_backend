@@ -4,7 +4,10 @@ import socket
 from pathlib import Path
 from models.config import settings
 
-socket.getaddrinfo = lambda h, p, f=0, t=0, pr=0, fl=0: socket.getaddrinfo(h, p, socket.AF_INET, t, pr, fl)
+_original_getaddrinfo = socket.getaddrinfo
+def _ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
+    return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+socket.getaddrinfo = _ipv4_only
 
 HF_WHISPER_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
 MAX_RETRIES = 3
