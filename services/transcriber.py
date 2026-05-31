@@ -1,13 +1,32 @@
 import httpx
 import time
 import socket
+import subprocess
+import re
 from pathlib import Path
 from models.config import settings
 
-_original_getaddrinfo = socket.getaddrinfo
-def _ipv4_only(host, port, family=0, type=0, proto=0, flags=0):
-    return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
-socket.getaddrinfo = _ipv4_only
+_orig_getaddrinfo = socket.getaddrinfo
+
+def _resolve_with_fallback(host, port, family=0, type=0, proto=0, flags=0):
+    try:
+        return _orig_getaddrinfo(host, port, family, type, proto, flags)
+    except socket.gaierror:
+        pass
+    try:
+        result = subprocess.run(
+            ["nslookup", host, "8.8.8.8"],
+            capture_output=True, text=True, timeout=5
+        )
+        for line in result.stdout.splitlines():
+            m = re.search(r'Address:\s+(\d+\.\d+\.\d+\.\d+)$', line)
+            if m:
+                return [(socket.AF_INET, type, proto, '', (m.group(1), port))]
+    except Exception:
+        pass
+    raise socket.gaierror(-5, "No address associated with hostname")
+
+socket.getaddrinfo = _resolve_with_fallback
 
 HF_WHISPER_URL = "https://api-inference.huggingface.co/models/openai/whisper-large-v3"
 MAX_RETRIES = 3
