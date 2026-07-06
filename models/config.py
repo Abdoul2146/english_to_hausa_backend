@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     BASE_URL: str = "http://localhost:8000"
 
     # Paths
-    STORAGE_DIR: str = "C:\\Backend\\english_to_hausa\\downloads"
+    STORAGE_DIR: str = "/tmp/downloads"
     MODEL_CACHE_DIR: str = "C:\\Backend\\english_to_hausa\\models_cache"
 
     # Processing Limits

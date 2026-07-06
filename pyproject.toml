@@ -5,7 +5,7 @@ description = "FastAPI English to Hausa translation and synthesis pipeline"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "fastapi>=0.110.0",
+    "fastapi[standard]>=0.110.0",
     "uvicorn>=0.28.0",
     "pydantic>=2.6.0",
     "pydantic-settings>=2.2.0",
