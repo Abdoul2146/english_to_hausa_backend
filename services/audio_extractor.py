@@ -1,13 +1,14 @@
 import subprocess
 from pathlib import Path
+from imageio_ffmpeg import get_ffmpeg_exe
 from services.file_manager import get_job_file_path
 
 def extract_audio_wav(job_id: str, video_path: Path) -> Path:
     output_wav = get_job_file_path(job_id, "audio.wav")
+    ffmpeg_path = get_ffmpeg_exe()
     
-    # Run ffmpeg to convert to 16kHz mono WAV
     command = [
-        "ffmpeg", "-y",
+        ffmpeg_path, "-y",
         "-i", str(video_path),
         "-vn",
         "-acodec", "pcm_s16le",
