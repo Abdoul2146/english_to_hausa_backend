@@ -10,14 +10,18 @@ def transcribe_audio(audio_path: Path) -> dict:
     with open(audio_path, "rb") as f:
         audio_bytes = f.read()
 
-    headers = {"Authorization": f"Bearer {settings.HF_TOKEN}"}
+    headers = {
+        "Authorization": f"Bearer {settings.HF_TOKEN}",
+        "Content-Type": "audio/wav",
+        "x-wait-for-model": "1",
+    }
 
     for attempt in range(MAX_RETRIES):
         try:
             with httpx.Client(timeout=120.0) as client:
                 response = client.post(HF_WHISPER_URL, headers=headers, data=audio_bytes)
 
-            if response.status_code == 503:
+            if response.status_code in (502, 503):
                 time.sleep(5)
                 continue
 
