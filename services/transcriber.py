@@ -18,7 +18,7 @@ def transcribe_audio(audio_path: Path) -> dict:
 
     for attempt in range(MAX_RETRIES):
         try:
-            with httpx.Client(timeout=120.0) as client:
+            with httpx.Client(timeout=300.0) as client:
                 response = client.post(HF_WHISPER_URL, headers=headers, data=audio_bytes)
 
             if response.status_code in (502, 503):
@@ -28,7 +28,7 @@ def transcribe_audio(audio_path: Path) -> dict:
             response.raise_for_status()
             result = response.json()
             break
-        except (httpx.ConnectError, httpx.RemoteProtocolError):
+        except httpx.HTTPError:
             if attempt == MAX_RETRIES - 1:
                 raise
             time.sleep(2 ** attempt)
