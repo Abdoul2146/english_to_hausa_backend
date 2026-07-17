@@ -3,7 +3,7 @@ import time
 from models.config import settings
 
 GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
-GEMINI_MODELS = ["gemini-3.5-flash", "gemini-2.5-flash"]
+GEMINI_MODELS = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-3.1-flash-lite"]
 
 TRANSLATION_PROMPT = (
     "You are a professional translator. Translate the following English text "
@@ -33,10 +33,10 @@ def translate_text(text: str, source_lang: str = "en", target_lang: str = "ha") 
 
         for attempt in range(MAX_RETRIES):
             try:
-                with httpx.Client(timeout=60.0) as client:
+                with httpx.Client(timeout=300.0) as client:
                     response = client.post(url, json=payload)
 
-                if response.status_code in (502, 503):
+                if response.status_code in (502, 503, 504):
                     if attempt < MAX_RETRIES - 1:
                         time.sleep(2 ** attempt)
                         continue
@@ -54,7 +54,7 @@ def translate_text(text: str, source_lang: str = "en", target_lang: str = "ha") 
             except httpx.HTTPStatusError as e:
                 last_error = e
                 break
-            except (httpx.ConnectError, httpx.RemoteProtocolError):
+            except httpx.RequestError:
                 if attempt == MAX_RETRIES - 1:
                     last_error = httpx.ConnectError(f"Connection failed for {model}")
                     break
